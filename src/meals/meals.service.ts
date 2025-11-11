@@ -1,69 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Meal } from './entities/meal.entity';
+import { Image } from '../images/entities/image.entity';
+import { MealType } from '../meal-type/entities/meal_type.entity';
 
-interface Serving {
+interface MealData {
   id: number;
   name: string;
 }
 
-interface Image {
+interface ImageData {
   file: string;
   type: string;
 }
 
 @Injectable()
-export class MealsService {
-  constructor(private readonly httpService: HttpService) {}
+export class MealsService implements OnModuleInit {
+  constructor(
+    private readonly httpService: HttpService,
+    @InjectRepository(Meal) private readonly mealsRepo: Repository<Meal>,
+    @InjectRepository(Image) private readonly imagesRepo: Repository<Image>,
+    @InjectRepository(MealType)
+    private readonly mealTypeRepo: Repository<MealType>,
+  ) {}
 
+  // 🔹 Uruchamiane przy starcie aplikacji
+  async onModuleInit() {
+    console.log('🌱 Fetching meals on app start...');
+    try {
+      await this.fetchMeals();
+      console.log('✅ Meals fetched successfully on app start');
+    } catch (err) {
+      console.error('❌ Error fetching meals on app start:', err);
+    }
+  }
+
+  // 🔹 Główna funkcja pobierająca posiłki z API
   async fetchMeals() {
-    // Pobieramy aktualną datę w formacie YYYY-MM-DD
     const today = new Date().toISOString().split('T')[0];
-
     const url = `https://ntfy.pl/wp-json/dccore/v1/menu-planner?date=${today}&expansions__in=serving_id%2Cserving.multimedia_collection%2Cmeal_type_id%2Cmeal_id%2Cmeal.category_id%2Csize_id&brand_id=11&package_id=20`;
 
-    const response = await firstValueFrom(
-      this.httpService.get(url, {
-        headers: {
-          accept: '*/*',
-          'content-type': 'application/json',
-        },
-      }),
-    );
-
+    const response = await firstValueFrom(this.httpService.get(url));
     const data = response.data;
+    if (!data?.includes?.meals) return [];
 
-    const servingsMap = new Map<number, Serving>(
-      data.includes.servings.map((s: Serving) => [s.id, s]),
+    // Mapy dla szybkiego lookup
+    const mealsMap = new Map<number, MealData>(
+      data.includes.meals.map((m: MealData) => [m.id, m]),
     );
 
-    const imagesMap = new Map<number, Image[]>(
+    const imagesMap = new Map<number, ImageData[]>(
       data.includes.multimedia_collection.map(
-        (m: { serving_id: number; images: Image[] }) => [
+        (m: { serving_id: number; images: ImageData[] }) => [
           m.serving_id,
           m.images,
         ],
       ),
     );
 
-    const result = data.results[today]?.map(
-      (item: { serving_id: number; meal_type_id: number }) => {
-        const serving = servingsMap.get(item.serving_id);
+    const results = data.results[today]?.map(
+      (item: { meal_id: number; meal_type_id: number; serving_id: number }) => {
+        const meal = mealsMap.get(item.meal_id);
         const images = imagesMap.get(item.serving_id) || [];
-
-        // Filtrujemy tylko MULTIMEDIA_VERTICAL i bierzemy pierwszy pasujący
         const verticalImage = images.find(
           (img) => img.type === 'MULTIMEDIA_VERTICAL',
         );
-
-        const meal_type = data.includes.meal_types?.find(
+        const mealTypeName = data.includes.meal_types?.find(
           (mt: any) => mt.id === item.meal_type_id,
         )?.name;
 
         return {
-          serving_id: item.serving_id, // <- dodane
-          meal_type: meal_type || null,
-          name: serving?.name || null,
+          meal_id: item.meal_id,
+          meal_type_name: mealTypeName!,
+          name: meal?.name || null,
           image: verticalImage
             ? `https://dccore.ntfy.pl/upload/multimedia/${verticalImage.file}`
             : null,
@@ -71,6 +83,42 @@ export class MealsService {
       },
     );
 
-    return result || [];
+    if (!results) return [];
+
+    for (const item of results) {
+      // Szukamy meal_type po nazwie
+      const mealType = await this.mealTypeRepo.findOne({
+        where: { name: item.meal_type_name },
+      });
+
+      if (!mealType)
+        throw new Error(`MealType not found in DB: ${item.meal_type_name}`);
+
+      // Sprawdzamy, czy już istnieje meal o tym meal_id
+      const existingMeal = await this.mealsRepo.findOne({
+        where: { meal_id: item.meal_id },
+      });
+
+      if (!existingMeal) {
+        const newMeal = this.mealsRepo.create({
+          meal_id: item.meal_id,
+          name: item.name,
+          meal_type_id: mealType.id,
+          meal_type: mealType,
+        });
+
+        await this.mealsRepo.save(newMeal);
+
+        if (item.image) {
+          const newImage = this.imagesRepo.create({
+            url: item.image,
+            meal: newMeal,
+          });
+          await this.imagesRepo.save(newImage);
+        }
+      }
+    }
+
+    return results;
   }
 }
