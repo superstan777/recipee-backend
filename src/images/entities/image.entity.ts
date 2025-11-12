@@ -13,10 +13,10 @@ export class Image {
   id: number;
 
   @Column()
-  serving_id: number;
+  meal_id: number;
 
   @ManyToOne(() => Meal, (m) => m.images, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'serving_id' })
+  @JoinColumn({ name: 'meal_id' })
   meal: Meal;
 
   @Column()
