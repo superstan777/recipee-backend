@@ -8,12 +8,14 @@ export class MealsCronService {
 
   @Cron('0 1 * * *') // codziennie o 1:00 w nocy
   async handleCron() {
-    console.log('🌙 Running nightly meals fetch...');
+    console.log('Running nightly meals fetch...');
     try {
-      await this.mealsService.fetchMeals();
-      console.log('✅ Nightly meals fetch completed');
+      const results = await this.mealsService.fetchAndStoreMeals();
+      console.log(
+        `Nightly meals fetch completed. Fetched ${results.length} meals.`,
+      );
     } catch (err) {
-      console.error('❌ Error in nightly meals fetch:', err);
+      console.error('Error in nightly meals fetch:', err);
     }
   }
 }
