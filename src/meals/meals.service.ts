@@ -27,7 +27,6 @@ export class MealsService implements OnModuleInit {
     private readonly mealTypeRepo: Repository<MealType>,
   ) {}
 
-  // 🔹 Uruchamiane przy starcie aplikacji
   async onModuleInit() {
     console.log('🌱 Fetching meals on app start...');
     try {
@@ -38,7 +37,6 @@ export class MealsService implements OnModuleInit {
     }
   }
 
-  // 🔹 Główna funkcja pobierająca posiłki z API
   async fetchMeals() {
     const today = new Date().toISOString().split('T')[0];
     const url = `https://ntfy.pl/wp-json/dccore/v1/menu-planner?date=${today}&expansions__in=serving_id%2Cserving.multimedia_collection%2Cmeal_type_id%2Cmeal_id%2Cmeal.category_id%2Csize_id&brand_id=11&package_id=20`;
@@ -120,5 +118,42 @@ export class MealsService implements OnModuleInit {
     }
 
     return results;
+  }
+
+  async getMealsCursor({ cursor, limit }: { cursor?: string; limit: number }) {
+    const query = this.mealsRepo
+      .createQueryBuilder('meal')
+      .leftJoinAndSelect('meal.meal_type', 'meal_type')
+      .leftJoinAndSelect('meal.images', 'images')
+      .orderBy('meal.id', 'DESC')
+      .take(limit);
+
+    if (cursor) {
+      query.where('meal.id < :cursor', { cursor: parseInt(cursor, 10) });
+    }
+
+    const meals = await query.getMany();
+
+    const transformedMeals = meals.map((meal) => ({
+      id: meal.id,
+      meal_id: meal.meal_id,
+      name: meal.name,
+      meal_type: meal.meal_type?.name || null, // 👈 tylko nazwa
+      hidden: meal.hidden,
+      done: meal.done,
+      rating: meal.rating,
+      created_at: meal.created_at,
+      image:
+        meal.images && meal.images.length > 0
+          ? {
+              url: meal.images[0].url,
+              local_path: meal.images[0].local_path,
+            }
+          : null,
+    }));
+
+    const nextCursor = meals.length > 0 ? meals[meals.length - 1].id : null;
+
+    return { data: transformedMeals, nextCursor };
   }
 }
