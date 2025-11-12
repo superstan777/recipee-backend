@@ -1,6 +1,6 @@
 import {
   Entity,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   ManyToOne,
@@ -15,8 +15,11 @@ export type Rating = 'good' | 'bad' | null;
 
 @Entity('meals')
 export class Meal {
-  @PrimaryColumn({ unique: true })
-  meal_id: number;
+  @PrimaryGeneratedColumn()
+  id: number; // <-- własne auto increment, cursor do paginacji
+
+  @Column({ unique: true })
+  meal_id: number; // identyfikator z API
 
   @Column()
   name: string;
