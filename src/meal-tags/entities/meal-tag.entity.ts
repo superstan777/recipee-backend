@@ -1,7 +1,6 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   ManyToOne,
   JoinColumn,
   Unique,
@@ -9,25 +8,19 @@ import {
 import { Meal } from '../../meals/entities/meal.entity';
 import { SidebarTag } from '../../sidebar-tags/entities/sidebar_tag.entity';
 
-@Entity('meal_sidebar_tags')
-@Unique(['meal_id', 'tag_id'])
-export class MealSidebarTag {
+@Entity('meal_tags')
+@Unique(['meal', 'tag'])
+export class MealTag {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  meal_id: number;
-
-  @ManyToOne(() => Meal, (meal) => meal.sidebar_tags, {
+  @ManyToOne(() => Meal, (meal) => meal.meal_tags, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'meal_id' })
   meal: Meal;
 
-  @Column()
-  tag_id: number;
-
-  @ManyToOne(() => SidebarTag, (tag) => tag.meal_sidebar_tags, {
+  @ManyToOne(() => SidebarTag, (tag) => tag.meal_tags, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'tag_id' })

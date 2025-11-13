@@ -8,13 +8,15 @@ import { SidebarTagsModule } from './sidebar-tags/sidebar-tags.module';
 import { CronModule } from './cron/cron.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/database.config';
-import { MealSidebarTagsModule } from './meal-sidebar-tags/meal-sidebar-tags.module';
+
 import { SidebarModule } from './sidebar/sidebar.module';
+
+import { MealTagsModule } from './meal-tags/meal-tags.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
-    MealSidebarTagsModule,
+    MealTagsModule,
     MealsModule,
     ImagesModule,
     MealTypesModule,

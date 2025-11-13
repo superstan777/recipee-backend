@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { MealType } from '../../meal-types/entities/meal_types.entity';
-import { MealSidebarTag } from '../../meal-sidebar-tags/entities/meal_sidebar_tag.entity';
+import { MealTag } from '../../meal-tags/entities/meal-tag.entity';
 
 @Entity('sidebar_tags')
 export class SidebarTag {
@@ -26,6 +26,7 @@ export class SidebarTag {
   @Column()
   tag_name: string;
 
-  @OneToMany(() => MealSidebarTag, (mst) => mst.tag)
-  meal_sidebar_tags: MealSidebarTag[];
+  // 🔹 Relacja z MealTag
+  @OneToMany(() => MealTag, (mealTag) => mealTag.tag)
+  meal_tags: MealTag[];
 }

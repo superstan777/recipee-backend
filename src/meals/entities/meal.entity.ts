@@ -7,9 +7,9 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { MealType } from 'src/meal-types/entities/meal_types.entity';
-import { Image } from 'src/images/entities/image.entity';
-import { MealSidebarTag } from 'src/meal-sidebar-tags/entities/meal_sidebar_tag.entity';
+import { MealType } from '../../meal-types/entities/meal_types.entity';
+import { Image } from '../../images/entities/image.entity';
+import { MealTag } from '../../meal-tags/entities/meal-tag.entity';
 
 export type Rating = 'good' | 'bad' | null;
 
@@ -49,6 +49,7 @@ export class Meal {
   @OneToMany(() => Image, (img) => img.meal)
   images: Image[];
 
-  @OneToMany(() => MealSidebarTag, (mst) => mst.meal)
-  sidebar_tags: MealSidebarTag[];
+  // 🔹 Relacja z MealTag
+  @OneToMany(() => MealTag, (mealTag) => mealTag.meal)
+  meal_tags: MealTag[];
 }
