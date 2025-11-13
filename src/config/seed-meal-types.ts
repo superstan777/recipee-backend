@@ -1,5 +1,5 @@
 import { dataSource } from '../database/data-source';
-import { MealType } from 'src/meal-type/entities/meal_type.entity';
+import { MealType } from 'src/meal-types/entities/meal_types.entity';
 
 export async function seedMealTypes() {
   await dataSource.initialize();

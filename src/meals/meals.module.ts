@@ -9,7 +9,7 @@ import { MealsController } from './meals.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
 import { Image } from '../images/entities/image.entity';
-import { MealType } from '../meal-type/entities/meal_type.entity';
+import { MealType } from '../meal-types/entities/meal_types.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({

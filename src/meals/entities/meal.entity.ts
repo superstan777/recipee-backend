@@ -7,19 +7,19 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { MealType } from 'src/meal-type/entities/meal_type.entity';
+import { MealType } from 'src/meal-types/entities/meal_types.entity';
 import { Image } from 'src/images/entities/image.entity';
-import { MealCustomTag } from 'src/tags/entities/meal_custom_tag.entity';
+import { MealSidebarTag } from 'src/meal-sidebar-tags/entities/meal_sidebar_tag.entity';
 
 export type Rating = 'good' | 'bad' | null;
 
 @Entity('meals')
 export class Meal {
   @PrimaryGeneratedColumn()
-  id: number; // <-- własne auto increment, cursor do paginacji
+  id: number;
 
   @Column({ unique: true })
-  meal_id: number; // identyfikator z API
+  meal_id: number;
 
   @Column()
   name: string;
@@ -49,6 +49,6 @@ export class Meal {
   @OneToMany(() => Image, (img) => img.meal)
   images: Image[];
 
-  @OneToMany(() => MealCustomTag, (mct) => mct.meal)
-  custom_tags: MealCustomTag[];
+  @OneToMany(() => MealSidebarTag, (mst) => mst.meal)
+  sidebar_tags: MealSidebarTag[];
 }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Meal } from '../entities/meal.entity';
 import { Image } from '../../images/entities/image.entity';
-import { MealType } from '../../meal-type/entities/meal_type.entity';
+import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { FetchedMeal } from '../interfaces/meals.interfaces';
 
 @Injectable()
