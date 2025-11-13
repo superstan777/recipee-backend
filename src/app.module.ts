@@ -9,6 +9,7 @@ import { CronModule } from './cron/cron.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/database.config';
 import { MealSidebarTagsModule } from './meal-sidebar-tags/meal-sidebar-tags.module';
+import { SidebarModule } from './sidebar/sidebar.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MealSidebarTagsModule } from './meal-sidebar-tags/meal-sidebar-tags.mod
     MealTypesModule,
     SidebarTagsModule,
     CronModule,
+    SidebarModule,
   ],
   controllers: [AppController],
   providers: [AppService],
