@@ -15,13 +15,13 @@ export class Image {
   @Column()
   meal_id: number;
 
-  @ManyToOne(() => Meal, (m) => m.images, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'meal_id' })
+  @ManyToOne(() => Meal, (meal) => meal.images, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'meal_id', referencedColumnName: 'id' }) // wskazuje na Meal.id
   meal: Meal;
 
   @Column()
   url: string;
 
-  @Column({ nullable: true })
-  local_path: string;
+  @Column({ type: 'text', nullable: true })
+  local_path: string | null;
 }

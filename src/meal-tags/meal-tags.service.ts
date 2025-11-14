@@ -18,7 +18,7 @@ export class MealTagsService {
 
   async addTagToMeal(mealId: number, tagId: number) {
     // const meal = await this.mealRepo.findOne({ where: { id: mealId } });
-    const meal = await this.mealRepo.findOne({ where: { meal_id: mealId } });
+    const meal = await this.mealRepo.findOne({ where: { id: mealId } });
     if (!meal) throw new Error(`Meal with id ${mealId} not found`);
 
     const tag = await this.tagRepo.findOne({ where: { id: tagId } });

@@ -14,19 +14,21 @@ export class MealsQueryService {
       .createQueryBuilder('meal')
       .leftJoinAndSelect('meal.meal_type', 'meal_type')
       .leftJoinAndSelect('meal.images', 'images')
-      .where('meal.hidden = :hidden', { hidden: false }) // <-- dodane
-      .orderBy('meal.id', 'DESC')
+      .where('meal.hidden = :hidden', { hidden: false })
+      .orderBy('meal.pagination_id', 'DESC') // 🔹 zmienione na pagination_id
       .take(limit);
 
     if (cursor) {
-      query.andWhere('meal.id < :cursor', { cursor: parseInt(cursor, 10) });
+      query.andWhere('meal.pagination_id < :cursor', {
+        cursor: parseInt(cursor, 10),
+      }); // 🔹 pagination_id
     }
 
     const meals = await query.getMany();
 
     const transformedMeals = meals.map((meal) => ({
-      id: meal.id,
-      meal_id: meal.meal_id,
+      id: meal.id, // faktyczne ID posiłku
+      meal_id: meal.id, // jeśli frontend nadal oczekuje meal_id, ustawiamy to samo co id
       name: meal.name,
       meal_type: meal.meal_type?.name || null,
       hidden: meal.hidden,
@@ -42,7 +44,8 @@ export class MealsQueryService {
           : null,
     }));
 
-    const nextCursor = meals.length > 0 ? meals[meals.length - 1].id : null;
+    const nextCursor =
+      meals.length > 0 ? meals[meals.length - 1].pagination_id : null;
 
     return { data: transformedMeals, nextCursor };
   }

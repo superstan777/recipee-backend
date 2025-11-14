@@ -16,10 +16,10 @@ export type Rating = 'good' | 'bad' | null;
 @Entity('meals')
 export class Meal {
   @PrimaryGeneratedColumn()
-  id: number;
+  pagination_id: number;
 
   @Column({ unique: true })
-  meal_id: number;
+  id: number;
 
   @Column()
   name: string;
