@@ -43,13 +43,15 @@ export class Meal {
   @Column({ type: 'text', nullable: true })
   rating: Rating;
 
+  @Column({ default: true })
+  new: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 
   @OneToMany(() => Image, (img) => img.meal)
   images: Image[];
 
-  // 🔹 Relacja z MealTag
   @OneToMany(() => MealTag, (mealTag) => mealTag.meal)
   meal_tags: MealTag[];
 }

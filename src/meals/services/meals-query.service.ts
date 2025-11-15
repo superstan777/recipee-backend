@@ -93,6 +93,7 @@ export class MealsQueryService {
       hidden: meal.hidden,
       done: meal.done,
       rating: meal.rating,
+      new: meal.new,
       created_at: meal.created_at,
       image: meal.images?.[0]
         ? {

@@ -27,11 +27,20 @@ export class MealsService implements OnModuleInit {
     return fetched;
   }
 
-  async getMealsCursor(params: { cursor?: string; limit: number }) {
+  async getMealsCursor(params: {
+    mealTypeId?: string;
+    tagId?: string;
+    cursor?: string;
+    limit: number;
+  }) {
     return this.queryService.getMeals(params);
   }
 
   async hideMeal(mealId: number, hidden: boolean = true) {
     return this.storageService.hideMeal(mealId, hidden);
+  }
+
+  async markAsSeen(mealId: number) {
+    return this.storageService.markAsSeen(mealId);
   }
 }

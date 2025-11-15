@@ -25,15 +25,16 @@ export class MealsStorageService {
         throw new Error(`MealType not found in DB: ${item.meal_type_name}`);
 
       const existingMeal = await this.mealsRepo.findOne({
-        where: { id: item.meal_id }, // 🔹 teraz id zamiast meal_id
+        where: { id: item.meal_id },
       });
 
       if (!existingMeal) {
         const newMeal = this.mealsRepo.create({
-          id: item.meal_id, // 🔹 faktyczne ID
+          id: item.meal_id,
           name: item.name,
           meal_type_id: mealType.id,
           meal_type: mealType,
+          new: true,
         });
 
         await this.mealsRepo.save(newMeal);
@@ -50,10 +51,18 @@ export class MealsStorageService {
   }
 
   async hideMeal(mealId: number, hidden: boolean = true): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } }); // 🔹 id zamiast meal_id
+    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
     if (!meal) throw new Error(`Meal with id ${mealId} not found`);
 
     meal.hidden = hidden;
+    return this.mealsRepo.save(meal);
+  }
+
+  async markAsSeen(mealId: number): Promise<Meal> {
+    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
+    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
+
+    meal.new = false;
     return this.mealsRepo.save(meal);
   }
 }
