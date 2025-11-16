@@ -40,7 +40,7 @@ export async function seedMealTypes() {
   }
 
   await dataSource.destroy();
-  console.log('✅ Meal types seeded!');
+  console.log('Meal types seeded!');
 }
 
 // Uruchamianie z terminala
