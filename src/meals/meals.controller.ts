@@ -1,6 +1,15 @@
-import { Controller, Get, Query, Patch, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Patch,
+  Param,
+  Body,
+  Post,
+} from '@nestjs/common';
 import { MealsQueryService } from './services/meals-query.service';
 import { MealsService } from './meals.service';
+import { FetchedMeal } from './interfaces/meals.interfaces';
 
 @Controller('meals')
 export class MealsController {
@@ -37,5 +46,12 @@ export class MealsController {
   async markAsSeen(@Param('mealId') mealId: number) {
     const meal = await this.mealsService.markAsSeen(mealId);
     return { success: true, meal };
+  }
+
+  // Nowy POST endpoint do zapisu pobranych danych
+  @Post('add-meals')
+  async addMeals(@Body() fetchedMeals: FetchedMeal[]) {
+    await this.mealsService.storeMeals(fetchedMeals);
+    return { success: true, message: 'Meals saved successfully' };
   }
 }

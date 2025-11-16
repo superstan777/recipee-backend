@@ -1,30 +1,17 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { MealsFetchService } from './services/meals-fetch.service';
+import { Injectable } from '@nestjs/common';
 import { MealsStorageService } from './services/meals-storage.service';
 import { MealsQueryService } from './services/meals-query.service';
+import { FetchedMeal } from './interfaces/meals.interfaces';
 
 @Injectable()
-export class MealsService implements OnModuleInit {
+export class MealsService {
   constructor(
-    private readonly fetchService: MealsFetchService,
     private readonly storageService: MealsStorageService,
     private readonly queryService: MealsQueryService,
   ) {}
 
-  async onModuleInit() {
-    console.log('Fetching meals on app start...');
-    try {
-      await this.fetchAndStoreMeals();
-      console.log('Meals fetched and saved successfully');
-    } catch (err) {
-      console.error('Error fetching meals on app start:', err);
-    }
-  }
-
-  async fetchAndStoreMeals() {
-    const fetched = await this.fetchService.fetchMealsFromApi();
-    await this.storageService.saveFetchedMeals(fetched);
-    return fetched;
+  async storeMeals(fetchedMeals: FetchedMeal[]): Promise<void> {
+    await this.storageService.saveFetchedMeals(fetchedMeals);
   }
 
   async getMealsCursor(params: {

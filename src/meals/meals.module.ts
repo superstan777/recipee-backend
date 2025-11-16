@@ -4,7 +4,7 @@ import { MealsService } from './meals.service';
 import { MealsFetchService } from './services/meals-fetch.service';
 import { MealsStorageService } from './services/meals-storage.service';
 import { MealsQueryService } from './services/meals-query.service';
-import { MealsCronService } from './meals-cron.service';
+
 import { MealsController } from './meals.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
@@ -23,7 +23,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     MealsFetchService,
     MealsStorageService,
     MealsQueryService,
-    MealsCronService,
   ],
   controllers: [MealsController],
   exports: [MealsService],
