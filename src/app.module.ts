@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { MealsModule } from './meals/meals.module';
 import { ImagesModule } from './images/images.module';
 import { MealTypesModule } from './meal-types/meal-types.module';
 import { SidebarTagsModule } from './sidebar-tags/sidebar-tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config/database.config';
+import { typeOrmConfig } from './database/data-source';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { MealTagsModule } from './meal-tags/meal-tags.module';
 import { ConfigModule } from '@nestjs/config';
@@ -22,7 +21,7 @@ import { ConfigModule } from '@nestjs/config';
     SidebarTagsModule,
     SidebarModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
