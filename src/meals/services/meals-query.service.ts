@@ -91,7 +91,6 @@ export class MealsQueryService {
       name: meal.name,
       meal_type: meal.meal_type?.name || null,
       hidden: meal.hidden,
-      done: meal.done,
       rating: meal.rating,
       new: meal.new,
       created_at: meal.created_at,

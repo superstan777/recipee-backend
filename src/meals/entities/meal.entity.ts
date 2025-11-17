@@ -11,8 +11,6 @@ import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { Image } from '../../images/entities/image.entity';
 import { MealTag } from '../../meal-tags/entities/meal-tag.entity';
 
-export type Rating = 'good' | 'bad' | null;
-
 @Entity('meals')
 export class Meal {
   @PrimaryGeneratedColumn()
@@ -37,11 +35,8 @@ export class Meal {
   @Column({ default: false })
   hidden: boolean;
 
-  @Column({ default: false })
-  done: boolean;
-
-  @Column({ type: 'text', nullable: true })
-  rating: Rating;
+  @Column({ type: 'int', nullable: true })
+  rating: number | null;
 
   @Column({ default: true })
   new: boolean;
