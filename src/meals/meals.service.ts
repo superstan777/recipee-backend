@@ -43,4 +43,8 @@ export class MealsService implements OnModuleInit {
   async markAsSeen(mealId: number) {
     return this.storageService.markAsSeen(mealId);
   }
+
+  async rateMeal(mealId: number, rating: number | null) {
+    return this.storageService.rateMeal(mealId, rating);
+  }
 }

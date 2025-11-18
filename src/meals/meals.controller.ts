@@ -38,4 +38,13 @@ export class MealsController {
     const meal = await this.mealsService.markAsSeen(mealId);
     return { success: true, meal };
   }
+
+  @Patch(':mealId/rate')
+  async rateMeal(
+    @Param('mealId') mealId: number,
+    @Body('rating') rating: number | null,
+  ) {
+    const meal = await this.mealsService.rateMeal(mealId, rating);
+    return { success: true, meal };
+  }
 }

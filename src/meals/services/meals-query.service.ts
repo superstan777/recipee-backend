@@ -90,10 +90,8 @@ export class MealsQueryService {
       id: meal.id,
       name: meal.name,
       meal_type: meal.meal_type?.name || null,
-      hidden: meal.hidden,
       rating: meal.rating,
       new: meal.new,
-      created_at: meal.created_at,
       image: meal.images?.[0]
         ? {
             url: meal.images[0].url,
