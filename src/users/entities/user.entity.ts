@@ -3,10 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Check,
 } from 'typeorm';
 
 export type UserRole = 'user' | 'admin';
 
+@Check(`role IN ('user', 'admin')`)
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -18,7 +20,7 @@ export class User {
   @Column()
   passwordHash: string;
 
-  @Column({ type: 'enum', enum: ['user', 'admin'], default: 'user' })
+  @Column({ type: 'text', default: 'user' })
   role: UserRole;
 
   @CreateDateColumn({ name: 'created_at' })
