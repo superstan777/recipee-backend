@@ -9,7 +9,7 @@ import {
 import { Meal } from 'src/meals/entities/meal.entity';
 import { User } from 'src/users/entities/user.entity';
 
-@Entity('meal_status')
+@Entity('meal_statuses')
 @Unique(['meal', 'user'])
 export class MealStatus {
   @PrimaryGeneratedColumn()
