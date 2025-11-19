@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, Query } from '@nestjs/common';
+import { Controller, Patch, Post, Body, Param } from '@nestjs/common';
 import { MealStatusesService } from './meal-statuses.service';
 
 @Controller('meal-statuses')
@@ -6,16 +6,18 @@ export class MealStatusesController {
   constructor(private readonly mealStatusesService: MealStatusesService) {}
 
   // -----------------------------------
-  // GET statuses for many meals
-  // /meal-statuses?userId=1&mealIds=1,2,3
+  // POST statuses for many meals (body-based)
+  // /meal-statuses/batch
+  // body: { userId: number, mealIds: number[] }
   // -----------------------------------
-  @Get()
+  @Post('batch')
   async getStatusesForMeals(
-    @Query('userId') userId: number,
-    @Query('mealIds') mealIds: string,
+    @Body() body: { userId: number; mealIds: number[] },
   ) {
-    const ids = mealIds ? mealIds.split(',').map(Number) : [];
-    return this.mealStatusesService.getStatusesForMeals(userId, ids);
+    console.log('batch');
+
+    const { userId, mealIds } = body;
+    return this.mealStatusesService.getStatusesForMeals(userId, mealIds);
   }
 
   // -----------------------------------
@@ -32,9 +34,9 @@ export class MealStatusesController {
   }
 
   // -----------------------------------
-  // PATCH hidden
-  // /meal-statuses/:mealId/hidden
-  // body: { userId: number, hidden: boolean }
+  // PATCH hide
+  // /meal-statuses/:mealId/hide
+  // body: { userId: number }
   // -----------------------------------
   @Patch(':mealId/hide')
   async hideMeal(
