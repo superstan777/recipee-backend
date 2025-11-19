@@ -6,6 +6,7 @@ import { Image } from 'src/images/entities/image.entity';
 import { SidebarTag } from 'src/sidebar-tags/entities/sidebar_tag.entity';
 import { MealTag } from 'src/meal-tags/entities/meal-tag.entity';
 import { User } from 'src/users/entities/user.entity';
+import { MealStatus } from 'src/meal-statuses/entities/meal-status.entity';
 import * as bcrypt from 'bcrypt';
 
 const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
@@ -13,7 +14,7 @@ const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
 export const typeOrmConfig: DataSourceOptions = {
   type: 'sqlite',
   database: databasePath,
-  entities: [MealType, Meal, Image, MealTag, SidebarTag, User],
+  entities: [MealType, Meal, Image, MealTag, SidebarTag, User, MealStatus],
   synchronize: true,
 };
 
