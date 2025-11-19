@@ -49,32 +49,4 @@ export class MealsStorageService {
       }
     }
   }
-
-  async hideMeal(mealId: number, hidden: boolean = true): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    meal.hidden = hidden;
-    return this.mealsRepo.save(meal);
-  }
-
-  async markAsSeen(mealId: number): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    meal.new = false;
-    return this.mealsRepo.save(meal);
-  }
-
-  async rateMeal(mealId: number, rating: number | null): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    if (rating !== null && (rating < 1 || rating > 5)) {
-      throw new Error('Rating must be between 1 and 5');
-    }
-
-    meal.rating = rating;
-    return this.mealsRepo.save(meal);
-  }
 }

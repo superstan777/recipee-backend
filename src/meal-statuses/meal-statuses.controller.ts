@@ -36,12 +36,12 @@ export class MealStatusesController {
   // /meal-statuses/:mealId/hidden
   // body: { userId: number, hidden: boolean }
   // -----------------------------------
-  @Patch(':mealId/hidden')
-  async setHidden(
+  @Patch(':mealId/hide')
+  async hideMeal(
     @Param('mealId') mealId: number,
     @Body() body: { userId: number },
   ) {
-    return this.mealStatusesService.setHidden(body.userId, mealId);
+    return this.mealStatusesService.hideMeal(body.userId, mealId);
   }
 
   // -----------------------------------

@@ -62,7 +62,7 @@ export class MealStatusesService {
     return this.statusRepo.save(status);
   }
 
-  async setHidden(userId: number, mealId: number): Promise<MealStatus> {
+  async hideMeal(userId: number, mealId: number): Promise<MealStatus> {
     const status = await this.getOrCreateStatus(userId, mealId);
     status.hidden = true;
     return this.statusRepo.save(status);
