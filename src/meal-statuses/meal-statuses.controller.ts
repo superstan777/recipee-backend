@@ -14,8 +14,6 @@ export class MealStatusesController {
   async getStatusesForMeals(
     @Body() body: { userId: number; mealIds: number[] },
   ) {
-    console.log('batch');
-
     const { userId, mealIds } = body;
     return this.mealStatusesService.getStatusesForMeals(userId, mealIds);
   }

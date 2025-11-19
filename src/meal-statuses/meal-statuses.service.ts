@@ -74,119 +74,31 @@ export class MealStatusesService {
     return this.statusRepo.save(status);
   }
 
-  //   async getStatusesForMeals(userId: number, mealIds: number[]) {
-  //     if (!mealIds || mealIds.length === 0) return [];
-
-  //     // Pobierz istniejące statusy
-  //     const existing = await this.statusRepo.find({
-  //       where: {
-  //         user: { id: userId },
-  //         meal: { id: In(mealIds) },
-  //       },
-  //       relations: ['meal'],
-  //     });
-
-  //     const existingMealIds = new Set(existing.map((s) => s.meal.id));
-
-  //     // Lista brakujących posiłków
-  //     const missing = mealIds.filter((id) => !existingMealIds.has(id));
-
-  //     let created: MealStatus[] = [];
-
-  //     if (missing.length > 0) {
-  //       const toCreate = missing.map((mealId) =>
-  //         this.statusRepo.create({
-  //           user: { id: userId },
-  //           meal: { id: mealId },
-  //           hidden: false,
-  //           new: true,
-  //           rating: null,
-  //         }),
-  //       );
-
-  //       created = await this.statusRepo.save(toCreate);
-  //     }
-
-  //     return [...existing, ...created];
-  //   }
-  //   async getStatusesForMeals(userId: number, mealIds: number[]) {
-  //     if (!mealIds || mealIds.length === 0) return [];
-
-  //     // Pobierz istniejące statusy
-  //     const existing = await this.statusRepo.find({
-  //       where: {
-  //         user: { id: userId },
-  //         meal: { id: In(mealIds) },
-  //       },
-  //       relations: ['meal'],
-  //     });
-
-  //     const existingMealIds = new Set(existing.map((s) => s.meal.id));
-
-  //     // Lista brakujących posiłków
-  //     const missing = mealIds.filter((id) => !existingMealIds.has(id));
-
-  //     if (missing.length > 0) {
-  //       // Insert brakujących rekordów bez pobierania pełnych encji
-  //       const insertData = missing.map((mealId) => ({
-  //         user: { id: userId },
-  //         meal: { id: mealId },
-  //         hidden: false,
-  //         new: true,
-  //         rating: null,
-  //       }));
-
-  //       await this.statusRepo
-  //         .createQueryBuilder()
-  //         .insert()
-  //         .into(MealStatus)
-  //         .values(insertData)
-  //         .execute();
-
-  //       // Pobierz utworzone rekordy z DB
-  //       const created = await this.statusRepo.find({
-  //         where: {
-  //           user: { id: userId },
-  //           meal: { id: In(missing) },
-  //         },
-  //         relations: ['meal'],
-  //       });
-
-  //       return [...existing, ...created];
-  //     }
-
-  //     return existing;
-  //   }
   async getStatusesForMeals(userId: number, mealIds: number[]) {
     if (!mealIds || mealIds.length === 0) return [];
 
-    // Pobierz istniejące statusy
     const existing = await this.statusRepo.find({
       where: {
         user: { id: userId },
         meal: { id: In(mealIds) },
+        hidden: false,
       },
-      relations: ['meal', 'user'],
+      relations: ['meal'],
     });
 
     const existingMealIds = new Set(existing.map((s) => s.meal.id));
-
-    // Lista brakujących posiłków
     const missingIds = mealIds.filter((id) => !existingMealIds.has(id));
 
     let created: MealStatus[] = [];
 
     if (missingIds.length > 0) {
-      // Pobierz użytkownika raz
       const user = await this.usersRepo.findOne({ where: { id: userId } });
       if (!user) throw new Error(`User ${userId} not found`);
 
-      // Pobierz wszystkie brakujące posiłki
       const missingMeals = await this.mealsRepo.find({
         where: { id: In(missingIds) },
       });
 
-      // Tworzymy encje MealStatus
       const toCreate = missingMeals.map((meal) =>
         this.statusRepo.create({
           user,
@@ -197,10 +109,15 @@ export class MealStatusesService {
         }),
       );
 
-      // Zapisujemy je do bazy
       created = await this.statusRepo.save(toCreate);
     }
 
-    return [...existing, ...created];
+    const all = [...existing, ...created];
+
+    return all.map((s) => ({
+      meal_id: s.meal.id,
+      rating: s.rating,
+      new: s.new,
+    }));
   }
 }
