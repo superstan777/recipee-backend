@@ -63,7 +63,16 @@ export class MealStatusesService {
   }
 
   async hideMeal(userId: number, mealId: number): Promise<MealStatus> {
-    const status = await this.getOrCreateStatus(userId, mealId);
+    const status = await this.statusRepo.findOne({
+      where: { user: { id: userId }, meal: { id: mealId } },
+    });
+
+    if (!status) {
+      throw new Error(
+        `MealStatus not found for user ${userId} and meal ${mealId}. This should never happen.`,
+      );
+    }
+
     status.hidden = true;
     return this.statusRepo.save(status);
   }
