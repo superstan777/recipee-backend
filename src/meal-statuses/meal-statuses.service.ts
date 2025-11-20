@@ -86,10 +86,19 @@ export class MealStatusesService {
     };
   }
 
-  async markAsSeen(userId: number, mealId: number): Promise<MealStatus> {
+  async markAsSeen(userId: number, mealId: number) {
     const status = await this.getOrCreateStatus(userId, mealId);
+
     status.new = false;
-    return this.statusRepo.save(status);
+
+    const saved = await this.statusRepo.save(status);
+
+    return {
+      meal_id: saved.meal.id,
+      hidden: saved.hidden,
+      new: saved.new,
+      rating: saved.rating,
+    };
   }
 
   async getStatusesForMeals(userId: number, mealIds: number[]) {
