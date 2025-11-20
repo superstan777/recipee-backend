@@ -1,6 +1,14 @@
-import { Controller, Get, Query, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { MealsQueryService } from './services/meals-query.service';
 import { MealsService } from './meals.service';
+
+interface GetMealsDto {
+  mealTypeId?: string;
+  tagId?: string;
+  limit?: number;
+  cursor?: string;
+  userId: number;
+}
 
 @Controller('meals')
 export class MealsController {
@@ -9,18 +17,20 @@ export class MealsController {
     private mealsService: MealsService,
   ) {}
 
-  @Get()
-  getMeals(
-    @Query('mealTypeId') mealTypeId?: string,
-    @Query('tagId') tagId?: string,
-    @Query('limit') limit: string = '30',
-    @Query('cursor') cursor?: string,
-  ) {
+  @Post('meals')
+  getMeals(@Body() body: GetMealsDto) {
+    const { mealTypeId, tagId, limit = 30, cursor, userId } = body;
+
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+
     return this.mealsQueryService.getMeals({
       mealTypeId,
       tagId,
       cursor,
-      limit: parseInt(limit, 10),
+      limit,
+      userId,
     });
   }
 }

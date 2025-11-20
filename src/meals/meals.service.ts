@@ -32,6 +32,7 @@ export class MealsService implements OnModuleInit {
     tagId?: string;
     cursor?: string;
     limit: number;
+    userId: number; // <-- DODANE
   }) {
     return this.queryService.getMeals(params);
   }

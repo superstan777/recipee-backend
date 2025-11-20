@@ -62,9 +62,10 @@ export class MealStatusesService {
     return this.statusRepo.save(status);
   }
 
-  async hideMeal(userId: number, mealId: number): Promise<MealStatus> {
+  async hideMeal(userId: number, mealId: number) {
     const status = await this.statusRepo.findOne({
       where: { user: { id: userId }, meal: { id: mealId } },
+      relations: ['meal'], // potrzebne aby mieć meal.id
     });
 
     if (!status) {
@@ -74,7 +75,15 @@ export class MealStatusesService {
     }
 
     status.hidden = true;
-    return this.statusRepo.save(status);
+
+    const saved = await this.statusRepo.save(status);
+
+    return {
+      meal_id: saved.meal.id,
+      hidden: saved.hidden,
+      new: saved.new,
+      rating: saved.rating,
+    };
   }
 
   async markAsSeen(userId: number, mealId: number): Promise<MealStatus> {
@@ -90,7 +99,6 @@ export class MealStatusesService {
       where: {
         user: { id: userId },
         meal: { id: In(mealIds) },
-        hidden: false,
       },
       relations: ['meal'],
     });
@@ -127,6 +135,7 @@ export class MealStatusesService {
       meal_id: s.meal.id,
       rating: s.rating,
       new: s.new,
+      hidden: s.hidden,
     }));
   }
 }
