@@ -10,16 +10,26 @@ export class SidebarTagsService {
     private readonly sidebarTagRepo: Repository<SidebarTag>,
   ) {}
 
-  async create(meal_type_id: number, tag_name: string) {
-    const tag = this.sidebarTagRepo.create({ meal_type_id, tag_name });
+  async create(meal_type_id: number, tag_name: string, user_id: number) {
+    const tag = this.sidebarTagRepo.create({
+      meal_type_id,
+      tag_name,
+      user_id,
+    });
+
     return this.sidebarTagRepo.save(tag);
   }
 
-  async findAll() {
-    return this.sidebarTagRepo.find({ relations: ['meal_type'] });
+  async findAll(user_id: number) {
+    return this.sidebarTagRepo.find({
+      where: { user_id },
+      relations: ['meal_type'],
+    });
   }
 
-  async findByMealType(meal_type_id: number) {
-    return this.sidebarTagRepo.find({ where: { meal_type_id } });
+  async findByMealType(meal_type_id: number, user_id: number) {
+    return this.sidebarTagRepo.find({
+      where: { meal_type_id, user_id },
+    });
   }
 }

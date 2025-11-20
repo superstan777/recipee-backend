@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   Check,
+  OneToMany,
 } from 'typeorm';
+import { SidebarTag } from 'src/sidebar-tags/entities/sidebar_tag.entity';
 
 export type UserRole = 'user' | 'admin';
 
@@ -25,4 +27,7 @@ export class User {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @OneToMany(() => SidebarTag, (tag) => tag.user)
+  sidebar_tags: SidebarTag[];
 }

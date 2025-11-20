@@ -5,22 +5,24 @@ import { SidebarTagsService } from './sidebar-tags.service';
 export class SidebarTagsController {
   constructor(private readonly sidebarTagsService: SidebarTagsService) {}
 
-  // Pobierz wszystkie tagi
-  @Get()
-  async getAll() {
-    return this.sidebarTagsService.findAll();
+  @Get(':user_id')
+  async getAll(@Param('user_id') user_id: number) {
+    return this.sidebarTagsService.findAll(user_id);
   }
 
-  // Pobierz tagi dla konkretnego meal_type
-  @Get('meal-type/:meal_type_id')
-  async getByMealType(@Param('meal_type_id') meal_type_id: number) {
-    return this.sidebarTagsService.findByMealType(meal_type_id);
+  @Get('meal-type/:meal_type_id/:user_id')
+  async getByMealType(
+    @Param('meal_type_id') meal_type_id: number,
+    @Param('user_id') user_id: number,
+  ) {
+    return this.sidebarTagsService.findByMealType(meal_type_id, user_id);
   }
 
-  // Dodaj nowy sidebar tag
   @Post()
-  async create(@Body() body: { meal_type_id: number; tag_name: string }) {
-    const { meal_type_id, tag_name } = body;
-    return this.sidebarTagsService.create(meal_type_id, tag_name);
+  async create(
+    @Body() body: { meal_type_id: number; tag_name: string; user_id: number },
+  ) {
+    const { meal_type_id, tag_name, user_id } = body;
+    return this.sidebarTagsService.create(meal_type_id, tag_name, user_id);
   }
 }
