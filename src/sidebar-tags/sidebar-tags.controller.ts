@@ -1,28 +1,23 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { SidebarTagsService } from './sidebar-tags.service';
 
 @Controller('sidebar-tags')
 export class SidebarTagsController {
   constructor(private readonly sidebarTagsService: SidebarTagsService) {}
 
-  @Get(':user_id')
-  async getAll(@Param('user_id') user_id: number) {
-    return this.sidebarTagsService.findAll(user_id);
-  }
-
-  @Get('meal-type/:meal_type_id/:user_id')
+  @Post('meal-type')
   async getByMealType(
-    @Param('meal_type_id') meal_type_id: number,
-    @Param('user_id') user_id: number,
+    @Body('meal_type_id') meal_type_id: number,
+    @Body('user_id') user_id: number,
   ) {
     return this.sidebarTagsService.findByMealType(meal_type_id, user_id);
   }
 
   @Post()
-  async create(
-    @Body() body: { meal_type_id: number; tag_name: string; user_id: number },
+  async createTag(
+    @Body() body: { user_id: number; meal_type_id: number; tag_name: string },
   ) {
-    const { meal_type_id, tag_name, user_id } = body;
-    return this.sidebarTagsService.create(meal_type_id, tag_name, user_id);
+    const { user_id, meal_type_id, tag_name } = body;
+    return this.sidebarTagsService.createTag(user_id, meal_type_id, tag_name);
   }
 }
