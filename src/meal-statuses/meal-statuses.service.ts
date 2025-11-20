@@ -49,17 +49,29 @@ export class MealStatusesService {
   }
 
   async rateMeal(
-    userId: number,
-    mealId: number,
+    user_id: number,
+    meal_id: number,
     rating: number | null,
-  ): Promise<MealStatus> {
+  ): Promise<{
+    meal_id: number;
+    hidden: boolean;
+    new: boolean;
+    rating: number | null;
+  }> {
     if (rating !== null && (rating < 1 || rating > 5))
       throw new Error('Rating must be between 1 and 5');
 
-    const status = await this.getOrCreateStatus(userId, mealId);
+    const status = await this.getOrCreateStatus(user_id, meal_id);
     status.rating = rating;
 
-    return this.statusRepo.save(status);
+    const saved = await this.statusRepo.save(status);
+
+    return {
+      meal_id: saved.meal.id,
+      hidden: saved.hidden,
+      new: saved.new,
+      rating: saved.rating,
+    };
   }
 
   async hideMeal(userId: number, mealId: number) {

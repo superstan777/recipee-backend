@@ -23,12 +23,12 @@ export class MealStatusesController {
   // /meal-statuses/:mealId/rate
   // body: { userId: number, rating: number | null }
   // -----------------------------------
-  @Patch(':mealId/rate')
+  @Patch('rate')
   async rateMeal(
-    @Param('mealId') mealId: number,
-    @Body() body: { userId: number; rating: number | null },
+    @Body() body: { user_id: number; meal_id: number; rating: number | null },
   ) {
-    return this.mealStatusesService.rateMeal(body.userId, mealId, body.rating);
+    const { user_id, meal_id, rating } = body;
+    return this.mealStatusesService.rateMeal(user_id, meal_id, rating);
   }
 
   // -----------------------------------
