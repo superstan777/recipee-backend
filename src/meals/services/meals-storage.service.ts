@@ -17,6 +17,8 @@ export class MealsStorageService {
 
   async saveFetchedMeals(fetchedMeals: FetchedMeal[]): Promise<void> {
     for (const item of fetchedMeals) {
+      if (!item.image) continue;
+
       const mealType = await this.mealTypeRepo.findOne({
         where: { name: item.meal_type_name },
       });
@@ -39,13 +41,12 @@ export class MealsStorageService {
 
         await this.mealsRepo.save(newMeal);
 
-        if (item.image) {
-          const newImage = this.imagesRepo.create({
-            url: item.image,
-            meal: newMeal,
-          });
-          await this.imagesRepo.save(newImage);
-        }
+        const newImage = this.imagesRepo.create({
+          url: item.image,
+          meal: newMeal,
+        });
+
+        await this.imagesRepo.save(newImage);
       }
     }
   }
