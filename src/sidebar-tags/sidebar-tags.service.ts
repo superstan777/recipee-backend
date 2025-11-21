@@ -16,7 +16,7 @@ export class SidebarTagsService {
     });
 
     if (existing) {
-      throw new ConflictException('Tag o takiej nazwie już istnieje.');
+      throw new ConflictException('Tag o takiej nazwie już istnieje');
     }
 
     const tag = this.sidebarTagRepo.create({
