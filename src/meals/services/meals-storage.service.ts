@@ -5,6 +5,11 @@ import { Meal } from '../entities/meal.entity';
 import { Image } from '../../images/entities/image.entity';
 import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { FetchedMeal } from '../interfaces/meals.interfaces';
+import { IngredientsService } from '../../ingredients/ingredients.service';
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 @Injectable()
 export class MealsStorageService {
@@ -13,6 +18,7 @@ export class MealsStorageService {
     @InjectRepository(Image) private readonly imagesRepo: Repository<Image>,
     @InjectRepository(MealType)
     private readonly mealTypeRepo: Repository<MealType>,
+    private readonly ingredientsService: IngredientsService,
   ) {}
 
   async saveFetchedMeals(fetchedMeals: FetchedMeal[]): Promise<void> {
@@ -37,7 +43,7 @@ export class MealsStorageService {
           meal_type_id: mealType.id,
           meal_type: mealType,
           new: true,
-          ingredients_id: item.ingredients_id, // 🔥 dodane
+          ingredients_id: item.ingredients_id,
         });
 
         await this.mealsRepo.save(newMeal);
@@ -48,6 +54,13 @@ export class MealsStorageService {
         });
 
         await this.imagesRepo.save(newImage);
+
+        if (item.ingredients_id) {
+          await this.ingredientsService.fetchAndSaveIngredients(
+            item.ingredients_id,
+          );
+          await sleep(1000);
+        }
       }
     }
   }

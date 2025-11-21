@@ -8,13 +8,23 @@ import { MealTag } from 'src/meal-tags/entities/meal-tag.entity';
 import { User } from 'src/users/entities/user.entity';
 import { MealStatus } from 'src/meal-statuses/entities/meal-status.entity';
 import * as bcrypt from 'bcrypt';
+import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
 
 const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
 
 export const typeOrmConfig: DataSourceOptions = {
   type: 'sqlite',
   database: databasePath,
-  entities: [MealType, Meal, Image, MealTag, SidebarTag, User, MealStatus],
+  entities: [
+    MealType,
+    Meal,
+    Image,
+    MealTag,
+    SidebarTag,
+    User,
+    MealStatus,
+    Ingredients,
+  ],
   synchronize: true,
 };
 
