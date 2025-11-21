@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { SidebarTag } from 'src/sidebar-tags/entities/sidebar_tag.entity';
+import { MealTag } from 'src/meal-tags/entities/meal-tag.entity';
 
 export type UserRole = 'user' | 'admin';
 
@@ -30,4 +31,7 @@ export class User {
 
   @OneToMany(() => SidebarTag, (tag) => tag.user)
   sidebar_tags: SidebarTag[];
+
+  @OneToMany(() => MealTag, (mealTag) => mealTag.user)
+  meal_tags: MealTag[];
 }
