@@ -37,6 +37,7 @@ export class MealsStorageService {
           meal_type_id: mealType.id,
           meal_type: mealType,
           new: true,
+          ingredients_id: item.ingredients_id, // 🔥 dodane
         });
 
         await this.mealsRepo.save(newMeal);

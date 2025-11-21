@@ -44,6 +44,10 @@ export class Meal {
   @CreateDateColumn()
   created_at: Date;
 
+  // ← NOWA KOLUMNA
+  @Column({ type: 'varchar', length: 32 })
+  ingredients_id: string;
+
   @OneToMany(() => Image, (img) => img.meal)
   images: Image[];
 
