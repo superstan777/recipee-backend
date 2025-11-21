@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SidebarTag } from './entities/sidebar_tag.entity';
 import { Repository } from 'typeorm';
@@ -11,6 +11,14 @@ export class SidebarTagsService {
   ) {}
 
   async createTag(user_id: number, meal_type_id: number, tag_name: string) {
+    const existing = await this.sidebarTagRepo.findOne({
+      where: { user_id, meal_type_id, tag_name },
+    });
+
+    if (existing) {
+      throw new ConflictException('Tag o takiej nazwie już istnieje.');
+    }
+
     const tag = this.sidebarTagRepo.create({
       user_id,
       meal_type_id,
