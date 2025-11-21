@@ -12,10 +12,10 @@ export class MealStatusesController {
   // -----------------------------------
   @Post('batch')
   async getStatusesForMeals(
-    @Body() body: { userId: number; mealIds: number[] },
+    @Body() body: { user_id: number; meal_ids: number[] },
   ) {
-    const { userId, mealIds } = body;
-    return this.mealStatusesService.getStatusesForMeals(userId, mealIds);
+    const { user_id, meal_ids } = body;
+    return this.mealStatusesService.getStatusesForMeals(user_id, meal_ids);
   }
 
   // -----------------------------------
@@ -47,11 +47,11 @@ export class MealStatusesController {
   // /meal-statuses/:mealId/seen
   // body: { userId: number }
   // -----------------------------------
-  @Patch(':mealId/seen')
+  @Patch(':meal_id/seen')
   async markAsSeen(
-    @Param('mealId') mealId: number,
-    @Body() body: { userId: number },
+    @Param('meal_id') meal_id: number,
+    @Body() body: { user_id: number },
   ) {
-    return this.mealStatusesService.markAsSeen(body.userId, mealId);
+    return this.mealStatusesService.markAsSeen(body.user_id, meal_id);
   }
 }

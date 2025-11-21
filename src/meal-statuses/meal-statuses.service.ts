@@ -19,20 +19,20 @@ export class MealStatusesService {
   ) {}
 
   private async getOrCreateStatus(
-    userId: number,
-    mealId: number,
+    user_id: number,
+    meal_id: number,
   ): Promise<MealStatus> {
     let status = await this.statusRepo.findOne({
-      where: { user: { id: userId }, meal: { id: mealId } },
+      where: { user: { id: user_id }, meal: { id: meal_id } },
       relations: ['user', 'meal'],
     });
 
     if (!status) {
-      const user = await this.usersRepo.findOne({ where: { id: userId } });
-      const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
+      const user = await this.usersRepo.findOne({ where: { id: user_id } });
+      const meal = await this.mealsRepo.findOne({ where: { id: meal_id } });
 
-      if (!user) throw new Error(`User ${userId} not found`);
-      if (!meal) throw new Error(`Meal ${mealId} not found`);
+      if (!user) throw new Error(`User ${user_id} not found`);
+      if (!meal) throw new Error(`Meal ${meal_id} not found`);
 
       status = this.statusRepo.create({
         user,
@@ -74,15 +74,15 @@ export class MealStatusesService {
     };
   }
 
-  async hideMeal(userId: number, mealId: number) {
+  async hideMeal(user_id: number, meal_id: number) {
     const status = await this.statusRepo.findOne({
-      where: { user: { id: userId }, meal: { id: mealId } },
-      relations: ['meal'], // potrzebne aby mieć meal.id
+      where: { user: { id: user_id }, meal: { id: meal_id } },
+      relations: ['meal'],
     });
 
     if (!status) {
       throw new Error(
-        `MealStatus not found for user ${userId} and meal ${mealId}. This should never happen.`,
+        `MealStatus not found for user ${user_id} and meal ${meal_id}. This should never happen.`,
       );
     }
 
@@ -98,8 +98,8 @@ export class MealStatusesService {
     };
   }
 
-  async markAsSeen(userId: number, mealId: number) {
-    const status = await this.getOrCreateStatus(userId, mealId);
+  async markAsSeen(user_id: number, meal_id: number) {
+    const status = await this.getOrCreateStatus(user_id, meal_id);
 
     status.new = false;
 
@@ -113,25 +113,25 @@ export class MealStatusesService {
     };
   }
 
-  async getStatusesForMeals(userId: number, mealIds: number[]) {
-    if (!mealIds || mealIds.length === 0) return [];
+  async getStatusesForMeals(user_id: number, meal_ids: number[]) {
+    if (!meal_ids || meal_ids.length === 0) return [];
 
     const existing = await this.statusRepo.find({
       where: {
-        user: { id: userId },
-        meal: { id: In(mealIds) },
+        user: { id: user_id },
+        meal: { id: In(meal_ids) },
       },
       relations: ['meal'],
     });
 
     const existingMealIds = new Set(existing.map((s) => s.meal.id));
-    const missingIds = mealIds.filter((id) => !existingMealIds.has(id));
+    const missingIds = meal_ids.filter((id) => !existingMealIds.has(id));
 
     let created: MealStatus[] = [];
 
     if (missingIds.length > 0) {
-      const user = await this.usersRepo.findOne({ where: { id: userId } });
-      if (!user) throw new Error(`User ${userId} not found`);
+      const user = await this.usersRepo.findOne({ where: { id: user_id } });
+      if (!user) throw new Error(`User ${user_id} not found`);
 
       const missingMeals = await this.mealsRepo.find({
         where: { id: In(missingIds) },
