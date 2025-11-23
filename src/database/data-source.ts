@@ -9,6 +9,7 @@ import { User } from 'src/users/entities/user.entity';
 import { MealStatus } from 'src/meal-statuses/entities/meal-status.entity';
 import * as bcrypt from 'bcrypt';
 import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
+import { Recipe } from 'src/recipes/entities/recipe.entity';
 
 const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
 
@@ -24,6 +25,7 @@ export const typeOrmConfig: DataSourceOptions = {
     User,
     MealStatus,
     Ingredients,
+    Recipe,
   ],
   synchronize: true,
 };

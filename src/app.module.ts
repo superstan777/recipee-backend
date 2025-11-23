@@ -10,8 +10,8 @@ import { SidebarModule } from './sidebar/sidebar.module';
 import { MealTagsModule } from './meal-tags/meal-tags.module';
 import { ConfigModule } from '@nestjs/config';
 import { MealStatusesModule } from './meal-statuses/meal-statuses.module';
-import { IngredientsService } from './ingredients/ingredients.service';
 import { IngredientsModule } from './ingredients/ingredients.module';
+import { RecipesModule } from './recipes/recipes.module';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
     SidebarModule,
     MealStatusesModule,
     IngredientsModule,
+    RecipesModule,
   ],
   controllers: [],
 })

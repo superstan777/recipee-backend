@@ -12,6 +12,7 @@ import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { Image } from '../../images/entities/image.entity';
 import { MealTag } from '../../meal-tags/entities/meal-tag.entity';
 import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
+import { Recipe } from 'src/recipes/entities/recipe.entity';
 
 @Entity('meals')
 export class Meal {
@@ -59,4 +60,6 @@ export class Meal {
     cascade: true,
   })
   ingredients: Ingredients;
+  @OneToOne(() => Recipe, (recipe) => recipe.meal, { cascade: true })
+  recipe: Recipe;
 }
