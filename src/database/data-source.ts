@@ -27,7 +27,7 @@ export const typeOrmConfig: DataSourceOptions = {
     Ingredients,
     Recipe,
   ],
-  synchronize: true,
+  synchronize: false,
 };
 
 export const dataSource = new DataSource(typeOrmConfig);
