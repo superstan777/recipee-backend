@@ -9,6 +9,9 @@ import { typeOrmConfig } from './database/data-source';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { MealTagsModule } from './meal-tags/meal-tags.module';
 import { ConfigModule } from '@nestjs/config';
+import { MealStatusesModule } from './meal-statuses/meal-statuses.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
+import { RecipesModule } from './recipes/recipes.module';
 
 @Module({
   imports: [
@@ -20,8 +23,10 @@ import { ConfigModule } from '@nestjs/config';
     MealTypesModule,
     SidebarTagsModule,
     SidebarModule,
+    MealStatusesModule,
+    IngredientsModule,
+    RecipesModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}

@@ -13,29 +13,25 @@ export class SidebarService {
     private readonly sidebarTagRepo: Repository<SidebarTag>,
   ) {}
 
-  /**
-   * Zwraca sidebar w pełnej strukturze:
-   * [
-   *   { id, name, tags: [{ id, tag_name }, ...] },
-   *   ...
-   * ]
-   */
-  async getSidebar(): Promise<
+  async getSidebar(
+    user_id: number,
+  ): Promise<
     { id: number; name: string; tags: { id: number; tag_name: string }[] }[]
   > {
-    // pobieramy meal types z tagami
     const mealTypes = await this.mealTypeRepo.find({
       order: { id: 'ASC' },
-      relations: ['sidebar_tags'], // fetchujemy powiązane sidebar_tags
+      relations: ['sidebar_tags'],
     });
 
     return mealTypes.map((mt) => ({
       id: mt.id,
       name: mt.name,
-      tags: mt.sidebar_tags.map((tag) => ({
-        id: tag.id,
-        tag_name: tag.tag_name,
-      })),
+      tags: mt.sidebar_tags
+        .filter((tag) => tag.user_id === user_id) // <- filtr po user_id
+        .map((tag) => ({
+          id: tag.id,
+          tag_name: tag.tag_name,
+        })),
     }));
   }
 }

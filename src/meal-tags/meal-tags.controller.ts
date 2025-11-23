@@ -1,9 +1,10 @@
-import { Body, Controller, Post, Delete, Param, Get } from '@nestjs/common';
+import { Body, Controller, Post, Delete } from '@nestjs/common';
 import { MealTagsService } from './meal-tags.service';
 
 interface AddMealTagDto {
   meal_id: number;
   tag_id: number;
+  user_id: number;
 }
 
 @Controller('meal-tags')
@@ -12,29 +13,44 @@ export class MealTagsController {
 
   @Post()
   async addTagToMeal(@Body() dto: AddMealTagDto) {
-    const result = await this.mealTagsService.addTagToMeal(
+    // zwracamy samą relację MealTag
+    return this.mealTagsService.addTagToMeal(
+      dto.user_id,
       dto.meal_id,
       dto.tag_id,
     );
-    return { success: true, data: result };
   }
 
   @Delete()
   async removeTagFromMeal(@Body() dto: AddMealTagDto) {
-    const result = await this.mealTagsService.removeTagFromMeal(
+    await this.mealTagsService.removeTagFromMeal(
+      dto.user_id,
       dto.meal_id,
       dto.tag_id,
     );
-    return { success: true };
+
+    return true; // prosta odpowiedź
   }
 
-  @Get(':mealId')
-  async getTagsForMeal(@Param('mealId') mealId: number) {
-    return this.mealTagsService.getTagsForMeal(mealId);
+  @Post('tags-for-meal')
+  async getTagsForMeal(@Body() body: { user_id: number; meal_id: number }) {
+    const relations = await this.mealTagsService.getTagsForMeal(
+      body.user_id,
+      body.meal_id,
+    );
+
+    // frontend potrzebuje listy tagów → wyciągamy sam `tag`
+    return relations.map((rel) => rel.tag);
   }
 
-  @Get('by-tag/:tagId')
-  async getMealsByTag(@Param('tagId') tagId: number) {
-    return this.mealTagsService.getMealsByTag(tagId);
+  @Post('meals-by-tag')
+  async getMealsByTag(@Body() body: { user_id: number; tag_id: number }) {
+    const relations = await this.mealTagsService.getMealsByTag(
+      body.user_id,
+      body.tag_id,
+    );
+
+    // zwracamy tylko posiłki
+    return relations.map((rel) => rel.meal);
   }
 }

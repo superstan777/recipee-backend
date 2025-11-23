@@ -5,6 +5,11 @@ import { Meal } from '../entities/meal.entity';
 import { Image } from '../../images/entities/image.entity';
 import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { FetchedMeal } from '../interfaces/meals.interfaces';
+import { IngredientsService } from '../../ingredients/ingredients.service';
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 @Injectable()
 export class MealsStorageService {
@@ -13,10 +18,13 @@ export class MealsStorageService {
     @InjectRepository(Image) private readonly imagesRepo: Repository<Image>,
     @InjectRepository(MealType)
     private readonly mealTypeRepo: Repository<MealType>,
+    private readonly ingredientsService: IngredientsService,
   ) {}
 
   async saveFetchedMeals(fetchedMeals: FetchedMeal[]): Promise<void> {
     for (const item of fetchedMeals) {
+      if (!item.image) continue;
+
       const mealType = await this.mealTypeRepo.findOne({
         where: { name: item.meal_type_name },
       });
@@ -35,46 +43,25 @@ export class MealsStorageService {
           meal_type_id: mealType.id,
           meal_type: mealType,
           new: true,
+          ingredients_id: item.ingredients_id,
         });
 
         await this.mealsRepo.save(newMeal);
 
-        if (item.image) {
-          const newImage = this.imagesRepo.create({
-            url: item.image,
-            meal: newMeal,
-          });
-          await this.imagesRepo.save(newImage);
+        const newImage = this.imagesRepo.create({
+          url: item.image,
+          meal: newMeal,
+        });
+
+        await this.imagesRepo.save(newImage);
+
+        if (item.ingredients_id) {
+          await this.ingredientsService.fetchAndSaveIngredients(
+            item.ingredients_id,
+          );
+          await sleep(1000);
         }
       }
     }
-  }
-
-  async hideMeal(mealId: number, hidden: boolean = true): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    meal.hidden = hidden;
-    return this.mealsRepo.save(meal);
-  }
-
-  async markAsSeen(mealId: number): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    meal.new = false;
-    return this.mealsRepo.save(meal);
-  }
-
-  async rateMeal(mealId: number, rating: number | null): Promise<Meal> {
-    const meal = await this.mealsRepo.findOne({ where: { id: mealId } });
-    if (!meal) throw new Error(`Meal with id ${mealId} not found`);
-
-    if (rating !== null && (rating < 1 || rating > 5)) {
-      throw new Error('Rating must be between 1 and 5');
-    }
-
-    meal.rating = rating;
-    return this.mealsRepo.save(meal);
   }
 }

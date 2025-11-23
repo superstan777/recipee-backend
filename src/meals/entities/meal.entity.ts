@@ -5,11 +5,14 @@ import {
   CreateDateColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { MealType } from '../../meal-types/entities/meal_types.entity';
 import { Image } from '../../images/entities/image.entity';
 import { MealTag } from '../../meal-tags/entities/meal-tag.entity';
+import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
+import { Recipe } from 'src/recipes/entities/recipe.entity';
 
 @Entity('meals')
 export class Meal {
@@ -44,9 +47,19 @@ export class Meal {
   @CreateDateColumn()
   created_at: Date;
 
+  @Column({ type: 'varchar', length: 32 })
+  ingredients_id: string;
+
   @OneToMany(() => Image, (img) => img.meal)
   images: Image[];
 
   @OneToMany(() => MealTag, (mealTag) => mealTag.meal)
   meal_tags: MealTag[];
+
+  @OneToOne(() => Ingredients, (ingredients) => ingredients.meal, {
+    cascade: true,
+  })
+  ingredients: Ingredients;
+  @OneToOne(() => Recipe, (recipe) => recipe.meal, { cascade: true })
+  recipe: Recipe;
 }

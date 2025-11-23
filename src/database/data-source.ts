@@ -1,4 +1,3 @@
-// database/data-source.ts
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { join } from 'path';
 import { MealType } from 'src/meal-types/entities/meal_types.entity';
@@ -6,28 +5,41 @@ import { Meal } from 'src/meals/entities/meal.entity';
 import { Image } from 'src/images/entities/image.entity';
 import { SidebarTag } from 'src/sidebar-tags/entities/sidebar_tag.entity';
 import { MealTag } from 'src/meal-tags/entities/meal-tag.entity';
+import { User } from 'src/users/entities/user.entity';
+import { MealStatus } from 'src/meal-statuses/entities/meal-status.entity';
+import * as bcrypt from 'bcrypt';
+import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
+import { Recipe } from 'src/recipes/entities/recipe.entity';
 
-// ścieżka do pliku sqlite
 const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
 
 export const typeOrmConfig: DataSourceOptions = {
   type: 'sqlite',
   database: databasePath,
-  entities: [MealType, Meal, Image, MealTag, SidebarTag],
+  entities: [
+    MealType,
+    Meal,
+    Image,
+    MealTag,
+    SidebarTag,
+    User,
+    MealStatus,
+    Ingredients,
+    Recipe,
+  ],
   synchronize: true,
 };
 
 export const dataSource = new DataSource(typeOrmConfig);
 
-// opcjonalnie seed MealTypes
 export const initializeDatabase = async () => {
   if (!dataSource.isInitialized) {
     await dataSource.initialize();
   }
 
   const mealTypeRepo = dataSource.getRepository(MealType);
-  const count = await mealTypeRepo.count();
-  if (count === 0) {
+  const mealTypeCount = await mealTypeRepo.count();
+  if (mealTypeCount === 0) {
     const initialMealTypes = [
       { id: 1, name: 'Śniadanie' },
       { id: 2, name: 'Drugie śniadanie' },
@@ -38,5 +50,24 @@ export const initializeDatabase = async () => {
     ];
     await mealTypeRepo.save(initialMealTypes);
     console.log('Meal types seeded!');
+  }
+
+  const userRepo = dataSource.getRepository(User);
+  const adminExists = await userRepo.findOne({ where: { role: 'admin' } });
+
+  if (!adminExists) {
+    const password = 'admin123';
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const adminUser = userRepo.create({
+      email: 'admin@example.com',
+      passwordHash,
+      role: 'admin',
+    });
+
+    await userRepo.save(adminUser);
+    console.log(
+      'Admin user created! Email: admin@example.com, Password: admin123',
+    );
   }
 };

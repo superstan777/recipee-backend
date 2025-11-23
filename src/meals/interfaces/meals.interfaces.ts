@@ -13,4 +13,5 @@ export interface FetchedMeal {
   meal_type_name: string;
   name: string;
   image: string;
+  ingredients_id: string;
 }

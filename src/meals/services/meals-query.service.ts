@@ -14,11 +14,13 @@ export class MealsQueryService {
     tagId,
     limit,
     cursor,
+    userId,
   }: {
     mealTypeId?: string;
     tagId?: string;
     limit: number;
     cursor?: string;
+    userId: number;
   }) {
     if (mealTypeId && tagId) {
       throw new BadRequestException(
@@ -32,56 +34,43 @@ export class MealsQueryService {
       );
     }
 
+    const query = this.mealsRepo
+      .createQueryBuilder('meal')
+      .leftJoinAndSelect('meal.meal_type', 'meal_type')
+      .leftJoinAndSelect('meal.images', 'images')
+      .leftJoin(
+        'meal_statuses',
+        'status',
+        'status.meal_id = meal.id AND status.user_id = :userId',
+        { userId },
+      )
+      .orderBy('meal.pagination_id', 'DESC')
+      .take(limit);
+
+    if (cursor) {
+      query.andWhere('meal.pagination_id < :cursor', {
+        cursor: parseInt(cursor, 10),
+      });
+    }
+
     if (mealTypeId) {
-      const query = this.mealsRepo
-        .createQueryBuilder('meal')
-        .leftJoinAndSelect('meal.meal_type', 'meal_type')
-        .leftJoinAndSelect('meal.images', 'images')
-        .where('meal.meal_type_id = :mealTypeId', { mealTypeId })
-        .andWhere('meal.hidden = false')
-        .orderBy('meal.pagination_id', 'DESC')
-        .take(limit);
-
-      if (cursor) {
-        query.andWhere('meal.pagination_id < :cursor', {
-          cursor: parseInt(cursor, 10),
-        });
-      }
-
-      const meals = await query.getMany();
-
-      return {
-        data: this.transform(meals),
-        nextCursor:
-          meals.length > 0 ? meals[meals.length - 1].pagination_id : null,
-      };
-    }
-
-    if (tagId) {
-      const query = this.mealsRepo
-        .createQueryBuilder('meal')
-        .leftJoinAndSelect('meal.meal_type', 'meal_type')
-        .leftJoinAndSelect('meal.images', 'images')
+      query.andWhere('meal.meal_type_id = :mealTypeId', { mealTypeId });
+    } else if (tagId) {
+      query
         .leftJoin('meal.meal_tags', 'meal_tags')
-        .where('meal_tags.tag_id = :tagId', { tagId })
-        .andWhere('meal.hidden = false')
-        .orderBy('meal.pagination_id', 'DESC')
-        .take(limit);
-
-      if (cursor) {
-        query.andWhere('meal.pagination_id < :cursor', {
-          cursor: parseInt(cursor, 10),
-        });
-      }
-
-      const meals = await query.getMany();
-
-      return {
-        data: this.transform(meals),
-        nextCursor:
-          meals.length > 0 ? meals[meals.length - 1].pagination_id : null,
-      };
+        .andWhere('meal_tags.tag_id = :tagId', { tagId });
     }
+
+    // Filtrujemy po hidden, ale przepuszczamy te, które nie mają statusu
+    query.andWhere('(status.hidden IS NULL OR status.hidden = false)');
+
+    const meals = await query.getMany();
+
+    return {
+      data: this.transform(meals),
+      nextCursor:
+        meals.length > 0 ? meals[meals.length - 1].pagination_id : null,
+    };
   }
 
   private transform(meals: Meal[]) {
@@ -90,8 +79,6 @@ export class MealsQueryService {
       id: meal.id,
       name: meal.name,
       meal_type: meal.meal_type?.name || null,
-      rating: meal.rating,
-      new: meal.new,
       image: meal.images?.[0]
         ? {
             url: meal.images[0].url,

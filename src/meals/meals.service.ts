@@ -32,19 +32,8 @@ export class MealsService implements OnModuleInit {
     tagId?: string;
     cursor?: string;
     limit: number;
+    userId: number; // <-- DODANE
   }) {
     return this.queryService.getMeals(params);
-  }
-
-  async hideMeal(mealId: number, hidden: boolean = true) {
-    return this.storageService.hideMeal(mealId, hidden);
-  }
-
-  async markAsSeen(mealId: number) {
-    return this.storageService.markAsSeen(mealId);
-  }
-
-  async rateMeal(mealId: number, rating: number | null) {
-    return this.storageService.rateMeal(mealId, rating);
   }
 }

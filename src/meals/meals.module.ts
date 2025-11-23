@@ -11,12 +11,16 @@ import { MealsCronService } from './meals-cron.service';
 import { Meal } from './entities/meal.entity';
 import { Image } from '../images/entities/image.entity';
 import { MealType } from '../meal-types/entities/meal_types.entity';
+import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
+import { IngredientsModule } from 'src/ingredients/ingredients.module';
+import { Recipe } from 'src/recipes/entities/recipe.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([Meal, Image, MealType]),
+    TypeOrmModule.forFeature([Meal, Image, MealType, Ingredients, Recipe]),
     ScheduleModule.forRoot(),
+    IngredientsModule,
   ],
   providers: [
     MealsService,

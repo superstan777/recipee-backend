@@ -33,6 +33,17 @@ export class MealsFetchService {
       ),
     );
 
+    const servingsMap = new Map<number, any[]>();
+
+    if (data.includes.servings) {
+      for (const serving of data.includes.servings) {
+        if (!servingsMap.has(serving.meal_id)) {
+          servingsMap.set(serving.meal_id, []);
+        }
+        servingsMap.get(serving.meal_id)!.push(serving);
+      }
+    }
+
     const results: FetchedMeal[] =
       data.results[today]?.map(
         (item: {
@@ -42,20 +53,29 @@ export class MealsFetchService {
         }) => {
           const meal = mealsMap.get(item.meal_id);
           const images = imagesMap.get(item.serving_id) || [];
+
           const verticalImage = images.find(
             (img) => img.type === 'MULTIMEDIA_VERTICAL',
           );
-          const mealTypeName = data.includes.meal_types?.find(
-            (mt: any) => mt.id === item.meal_type_id,
-          )?.name;
+
+          const mealTypeName =
+            data.includes.meal_types?.find(
+              (mt: any) => mt.id === item.meal_type_id,
+            )?.name || null;
+
+          const allServings = servingsMap.get(item.meal_id) || [];
+          const firstServing = allServings[0] || null;
 
           return {
             meal_id: item.meal_id,
-            meal_type_name: mealTypeName!,
+            meal_type_name: mealTypeName,
             name: meal?.name || null,
+
             image: verticalImage
               ? `https://dccore.ntfy.pl/upload/multimedia/${verticalImage.file}`
               : null,
+
+            ingredients_id: firstServing?.crc32_hash,
           };
         },
       ) ?? [];

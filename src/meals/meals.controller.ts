@@ -1,6 +1,14 @@
-import { Controller, Get, Query, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { MealsQueryService } from './services/meals-query.service';
 import { MealsService } from './meals.service';
+
+interface GetMealsDto {
+  mealTypeId?: string;
+  tagId?: string;
+  limit?: number;
+  cursor?: string;
+  userId: number;
+}
 
 @Controller('meals')
 export class MealsController {
@@ -9,42 +17,20 @@ export class MealsController {
     private mealsService: MealsService,
   ) {}
 
-  @Get()
-  getMeals(
-    @Query('mealTypeId') mealTypeId?: string,
-    @Query('tagId') tagId?: string,
-    @Query('limit') limit: string = '30',
-    @Query('cursor') cursor?: string,
-  ) {
+  @Post('meals')
+  getMeals(@Body() body: GetMealsDto) {
+    const { mealTypeId, tagId, limit = 30, cursor, userId } = body;
+
+    if (!userId) {
+      throw new Error('userId is required');
+    }
+
     return this.mealsQueryService.getMeals({
       mealTypeId,
       tagId,
       cursor,
-      limit: parseInt(limit, 10),
+      limit,
+      userId,
     });
-  }
-
-  @Patch(':mealId/hide')
-  async hideMeal(
-    @Param('mealId') mealId: number,
-    @Body('hidden') hidden: boolean = true,
-  ) {
-    const meal = await this.mealsService.hideMeal(mealId, hidden);
-    return { success: true, meal };
-  }
-
-  @Patch(':mealId/seen')
-  async markAsSeen(@Param('mealId') mealId: number) {
-    const meal = await this.mealsService.markAsSeen(mealId);
-    return { success: true, meal };
-  }
-
-  @Patch(':mealId/rate')
-  async rateMeal(
-    @Param('mealId') mealId: number,
-    @Body('rating') rating: number | null,
-  ) {
-    const meal = await this.mealsService.rateMeal(mealId, rating);
-    return { success: true, meal };
   }
 }
