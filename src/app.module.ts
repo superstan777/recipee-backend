@@ -12,11 +12,15 @@ import { ConfigModule } from '@nestjs/config';
 import { MealStatusesModule } from './meal-statuses/meal-statuses.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { RecipesModule } from './recipes/recipes.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot(typeOrmConfig),
-    ConfigModule.forRoot(),
     MealTagsModule,
     MealsModule,
     ImagesModule,
@@ -26,6 +30,8 @@ import { RecipesModule } from './recipes/recipes.module';
     MealStatusesModule,
     IngredientsModule,
     RecipesModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [],
 })
