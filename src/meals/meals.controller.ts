@@ -1,36 +1,30 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Get } from '@nestjs/common';
 import { MealsQueryService } from './services/meals-query.service';
-import { MealsService } from './meals.service';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import type { Request } from 'express';
 
 interface GetMealsDto {
   mealTypeId?: string;
   tagId?: string;
   limit?: number;
   cursor?: string;
-  userId: number;
 }
 
 @Controller('meals')
 export class MealsController {
-  constructor(
-    private mealsQueryService: MealsQueryService,
-    private mealsService: MealsService,
-  ) {}
+  constructor(private mealsQueryService: MealsQueryService) {}
 
-  @Post('meals')
-  getMeals(@Body() body: GetMealsDto) {
-    const { mealTypeId, tagId, limit = 30, cursor, userId } = body;
-
-    if (!userId) {
-      throw new Error('userId is required');
-    }
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  getMeals(@Body() body: GetMealsDto, @Req() req: Request) {
+    const user = req.user as { id: number };
 
     return this.mealsQueryService.getMeals({
-      mealTypeId,
-      tagId,
-      cursor,
-      limit,
-      userId,
+      mealTypeId: body.mealTypeId,
+      tagId: body.tagId,
+      cursor: body.cursor,
+      limit: body.limit ?? 30,
+      userId: user.id, // <-- pobrane z JWT
     });
   }
 }
