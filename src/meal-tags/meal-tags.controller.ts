@@ -1,56 +1,60 @@
-import { Body, Controller, Post, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Delete, UseGuards, Req } from '@nestjs/common';
 import { MealTagsService } from './meal-tags.service';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import type { Request } from 'express';
 
 interface AddMealTagDto {
   meal_id: number;
   tag_id: number;
-  user_id: number;
 }
 
+interface MealDto {
+  meal_id: number;
+}
+
+interface TagDto {
+  tag_id: number;
+}
+
+@UseGuards(JwtAuthGuard)
 @Controller('meal-tags')
 export class MealTagsController {
   constructor(private readonly mealTagsService: MealTagsService) {}
 
   @Post()
-  async addTagToMeal(@Body() dto: AddMealTagDto) {
-    // zwracamy samą relację MealTag
-    return this.mealTagsService.addTagToMeal(
-      dto.user_id,
-      dto.meal_id,
-      dto.tag_id,
-    );
+  async addTagToMeal(@Body() dto: AddMealTagDto, @Req() req: Request) {
+    const user = req.user as { id: number };
+    return this.mealTagsService.addTagToMeal(user.id, dto.meal_id, dto.tag_id);
   }
 
   @Delete()
-  async removeTagFromMeal(@Body() dto: AddMealTagDto) {
+  async removeTagFromMeal(@Body() dto: AddMealTagDto, @Req() req: Request) {
+    const user = req.user as { id: number };
     await this.mealTagsService.removeTagFromMeal(
-      dto.user_id,
+      user.id,
       dto.meal_id,
       dto.tag_id,
     );
-
-    return true; // prosta odpowiedź
+    return true;
   }
 
   @Post('tags-for-meal')
-  async getTagsForMeal(@Body() body: { user_id: number; meal_id: number }) {
+  async getTagsForMeal(@Body() body: MealDto, @Req() req: Request) {
+    const user = req.user as { id: number };
     const relations = await this.mealTagsService.getTagsForMeal(
-      body.user_id,
+      user.id,
       body.meal_id,
     );
-
-    // frontend potrzebuje listy tagów → wyciągamy sam `tag`
     return relations.map((rel) => rel.tag);
   }
 
   @Post('meals-by-tag')
-  async getMealsByTag(@Body() body: { user_id: number; tag_id: number }) {
+  async getMealsByTag(@Body() body: TagDto, @Req() req: Request) {
+    const user = req.user as { id: number };
     const relations = await this.mealTagsService.getMealsByTag(
-      body.user_id,
+      user.id,
       body.tag_id,
     );
-
-    // zwracamy tylko posiłki
     return relations.map((rel) => rel.meal);
   }
 }

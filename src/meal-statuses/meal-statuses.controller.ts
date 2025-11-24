@@ -1,57 +1,55 @@
-import { Controller, Patch, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Patch,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { MealStatusesService } from './meal-statuses.service';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
+import type { Request } from 'express';
 
 @Controller('meal-statuses')
 export class MealStatusesController {
   constructor(private readonly mealStatusesService: MealStatusesService) {}
 
-  // -----------------------------------
-  // POST statuses for many meals (body-based)
-  // /meal-statuses/batch
-  // body: { userId: number, mealIds: number[] }
-  // -----------------------------------
+  @UseGuards(JwtAuthGuard)
   @Post('batch')
   async getStatusesForMeals(
-    @Body() body: { user_id: number; meal_ids: number[] },
+    @Body() body: { meal_ids: number[] },
+    @Req() req: Request,
   ) {
-    const { user_id, meal_ids } = body;
-    return this.mealStatusesService.getStatusesForMeals(user_id, meal_ids);
+    const user = req.user as { id: number };
+    return this.mealStatusesService.getStatusesForMeals(user.id, body.meal_ids);
   }
 
-  // -----------------------------------
-  // PATCH rate
-  // /meal-statuses/:mealId/rate
-  // body: { userId: number, rating: number | null }
-  // -----------------------------------
+  @UseGuards(JwtAuthGuard)
   @Patch('rate')
   async rateMeal(
-    @Body() body: { user_id: number; meal_id: number; rating: number | null },
+    @Body() body: { meal_id: number; rating: number | null },
+    @Req() req: Request,
   ) {
-    const { user_id, meal_id, rating } = body;
-    return this.mealStatusesService.rateMeal(user_id, meal_id, rating);
+    const user = req.user as { id: number };
+    return this.mealStatusesService.rateMeal(
+      user.id,
+      body.meal_id,
+      body.rating,
+    );
   }
 
-  // -----------------------------------
-  // PATCH hide
-  // /meal-statuses/:mealId/hide
-  // body: { userId: number }
-  // -----------------------------------
+  @UseGuards(JwtAuthGuard)
   @Patch('hide')
-  async hideMeal(@Body() body: { user_id: number; meal_id: number }) {
-    const { user_id, meal_id } = body;
-    return this.mealStatusesService.hideMeal(user_id, meal_id);
+  async hideMeal(@Body() body: { meal_id: number }, @Req() req: Request) {
+    const user = req.user as { id: number };
+    return this.mealStatusesService.hideMeal(user.id, body.meal_id);
   }
 
-  // -----------------------------------
-  // PATCH mark as seen
-  // /meal-statuses/:mealId/seen
-  // body: { userId: number }
-  // -----------------------------------
+  @UseGuards(JwtAuthGuard)
   @Patch(':meal_id/seen')
-  async markAsSeen(
-    @Param('meal_id') meal_id: number,
-    @Body() body: { user_id: number },
-  ) {
-    return this.mealStatusesService.markAsSeen(body.user_id, meal_id);
+  async markAsSeen(@Param('meal_id') meal_id: number, @Req() req: Request) {
+    const user = req.user as { id: number };
+    return this.mealStatusesService.markAsSeen(user.id, Number(meal_id));
   }
 }
