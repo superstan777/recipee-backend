@@ -25,10 +25,13 @@ export class AuthController {
     const token = await this.auth.login(body.email, body.password);
 
     res.cookie('access_token', token, {
+      // httpOnly: true,
+      // secure: true,
+      // maxAge: 1000 * 60 * 60 * 24 * 30, // 30 dni
+      // sameSite: 'none',
       httpOnly: true,
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 dni
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax',
     });
 
     return { message: 'Login successful' };
