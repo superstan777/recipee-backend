@@ -25,13 +25,10 @@ export class AuthController {
     const token = await this.auth.login(body.email, body.password);
 
     res.cookie('access_token', token, {
-      // httpOnly: true,
-      // secure: true,
-      // maxAge: 1000 * 60 * 60 * 24 * 30, // 30 dni
-      // sameSite: 'none',
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 dni
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // cross-origin cookies
     });
 
     return { message: 'Login successful' };
