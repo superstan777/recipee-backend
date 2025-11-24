@@ -21,8 +21,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
+            set -e
             cd recipee-backend  
             git pull
-            npm install --production
+            npm install
             npm run build
             pm2 restart all
