@@ -34,6 +34,23 @@ export class AuthController {
     return { message: 'Login successful' };
   }
 
+  @Post('signup')
+  async signup(
+    @Body() body: { email: string; password: string },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.auth.signup(body.email, body.password);
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 dni
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
+
+    return { message: 'Signup successful' };
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@Req() req: Request) {
