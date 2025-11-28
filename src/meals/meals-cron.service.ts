@@ -9,8 +9,9 @@ export class MealsCronService {
   @Cron('0 0 3 * * *')
   async handleCron() {
     console.log('Running nightly meals fetch at 3:00 AM...');
+    const today = new Date();
     try {
-      const results = await this.mealsService.fetchAndStoreMeals();
+      const results = await this.mealsService.fetchAndStoreMeals(today);
       console.log(
         `Nightly meals fetch completed. Fetched ${results.length} meals.`,
       );

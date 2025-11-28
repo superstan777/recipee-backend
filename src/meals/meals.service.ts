@@ -12,17 +12,19 @@ export class MealsService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    const today = new Date();
     console.log('Fetching meals on app start...');
+
     try {
-      await this.fetchAndStoreMeals();
+      await this.fetchAndStoreMeals(today);
       console.log('Meals fetched and saved successfully');
     } catch (err) {
       console.error('Error fetching meals on app start:', err);
     }
   }
 
-  async fetchAndStoreMeals() {
-    const fetched = await this.fetchService.fetchMealsFromApi();
+  async fetchAndStoreMeals(date: Date) {
+    const fetched = await this.fetchService.fetchMealsFromApi(date);
     await this.storageService.saveFetchedMeals(fetched);
     return fetched;
   }
