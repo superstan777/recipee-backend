@@ -11,7 +11,8 @@ import * as bcrypt from 'bcrypt';
 import { Ingredients } from 'src/ingredients/entities/ingredients.entity';
 import { Recipe } from 'src/recipes/entities/recipe.entity';
 
-const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
+// const databasePath = join(__dirname, '..', '..', 'database', 'meals.db');
+const databasePath = join(process.cwd(), 'database', 'meals.db');
 
 export const typeOrmConfig: DataSourceOptions = {
   type: 'sqlite',
